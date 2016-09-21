@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 #test
 
 #python code for ROS node 
@@ -5,7 +7,7 @@
 #use "smbus" module instead of "Wire.h" (Arduino I2C Library)
 #
 
-#!/usr/bin/env python
+
 import smbus
 import time
 import rospy
