@@ -1,0 +1,8 @@
+#test
+
+#python code for ROS node 
+#in reference to the pololu's repository https://github.com/pololu/vl53l0x-arduino (Use code:single.ino,VL53L0X.cpp,VL53L0X.h) 
+#use "smbus" module instead of "Wire.h" (Arduino I2C Library)
+#
+
+
