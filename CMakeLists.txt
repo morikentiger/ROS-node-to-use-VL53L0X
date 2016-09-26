@@ -136,6 +136,10 @@ add_executable(listener src/listener.cpp)
 target_link_libraries(listener ${catkin_LIBRARIES})
 add_dependencies(listener test_vl53l0x_messages_cpp)
 
+add_executable(test_vl53l0x_2ndnode src/VL53L0X.cpp src/Single.cpp)
+target_link_libraries(listener ${catkin_LIBRARIES})
+add_dependencies(listener test_vl53l0x_messages_cpp)
+
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(test_vl53l0x_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
