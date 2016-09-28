@@ -18,55 +18,75 @@
  */
 int main(int argc, char **argv)
 {
-
-	/**
-	* The ros::init() function needs to see argc and argv so that it can perform
-	* any ROS arguments and name remapping that were provided at the command line. For programmatic
-	* remappings you can use a different version of init() which takes remappings
-	* directly, but for most command-line programs, passing argc and argv is the easiest
-	* way to do it.  The third argument to init() is the name of the node.
-	*
-	* You must call one of the versions of ros::init() before using any other
-	* part of the ROS system.
-	*/
 	ros::init(argc, argv, "talker");
 
-	/**
-	* NodeHandle is the main access point to communications with the ROS system.
-	* The first NodeHandle constructed will fully initialize this node, and the last
-	* NodeHandle destructed will close down the node.
-	*/
 	ros::NodeHandle n;
 
-	/**
-	* The advertise() function is how you tell ROS that you want to
-	* publish on a given topic name. This invokes a call to the ROS
-	* master node, which keeps a registry of who is publishing and who
-	* is subscribing. After this advertise() call is made, the master
-	* node will notify anyone who is trying to subscribe to this topic name,
-	* and they will in turn negotiate a peer-to-peer connection with this
-	* node.  advertise() returns a Publisher object which allows you to
-	* publish messages on that topic through a call to publish().  Once
-	* all copies of the returned Publisher object are destroyed, the topic
-	* will be automatically unadvertised.
-	*
-	* The second parameter to advertise() is the size of the message queue
-	* used for publishing messages.  If messages are published more quickly
-	* than we can send them, the number here specifies how many messages to
-	* buffer up before throwing some away.
-	*/
 	ros::Publisher chatter_pub = n.advertise<std_msgs::String>("chatter", 1000);
 
 	ros::Rate loop_rate(10);
 
-	/**
-	* A count of how many messages we have sent. This is used to create
-	* a unique string for each message.
-	*/
-
 	char *i2cdevName = "/dev/i2c-7";
 	const unsigned char i2cAddress = 0x29;
 	int fd;
+
+	//struct timeval tv;
+	//gettimeofday(tv,NULL);
+
+/* まず，日時・時刻情報を格納するための変数を宣言 */
+    struct timeval myTime,myTime2;    // time_t構造体を定義．1970年1月1日からの秒数を格納するもの
+    struct tm *time_st,*time_st2;       // tm構造体を定義．年月日時分秒をメンバ変数に持つ構造体
+    const char weekName[7][4] = {   // 曜日は数字としてしか得られないので，文字列として用意
+        "Sun",
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat"
+    };
+
+    /* 時刻取得 */
+    gettimeofday(&myTime, NULL);    // 現在時刻を取得してmyTimeに格納．通常のtime_t構造体とsuseconds_tに値が代入される
+    time_st = localtime(&myTime.tv_sec);    // time_t構造体を現地時間でのtm構造体に変換
+
+	usleep(2000);
+
+    gettimeofday(&myTime2, NULL);    // 現在時刻を取得してmyTimeに格納．通常のtime_t構造体とsuseconds_tに値が代入される
+    time_st2 = localtime(&myTime2.tv_sec);    // time_t構造体を現地時間でのtm構造体に変換
+
+    printf("Date : %d/%02d/%02d(%s) %02d:%02d:%02d.%06d\n%d sec\n%d msec\n%d sec*1000\n",     // 現在時刻
+                time_st->tm_year+1900,     // 年
+                time_st->tm_mon+1,         // 月
+                time_st->tm_mday,          // 日
+                weekName[time_st->tm_wday],// 曜日
+                time_st->tm_hour,          // 時
+                time_st->tm_min,           // 分
+                time_st->tm_sec,           // 秒
+                myTime.tv_usec,            // マイクロ秒
+		myTime.tv_sec,
+                myTime.tv_usec/1000,
+		myTime.tv_sec*1000
+		);
+	printf("%d ms\n", (myTime.tv_sec ) * 1000 + (myTime.tv_usec ) / 1000);
+
+printf("Date : %d/%02d/%02d(%s) %02d:%02d:%02d.%06d\n%d sec\n%d msec\n%d sec*1000\n",     // 現在時刻
+                time_st2->tm_year+1900,     // 年
+                time_st2->tm_mon+1,         // 月
+                time_st2->tm_mday,          // 日
+                weekName[time_st2->tm_wday],// 曜日
+                time_st2->tm_hour,          // 時
+                time_st2->tm_min,           // 分
+                time_st2->tm_sec,           // 秒
+                myTime2.tv_usec,            // マイクロ秒
+		myTime2.tv_sec,
+                myTime2.tv_usec/1000,
+		myTime2.tv_sec*1000
+		);
+	printf("%d ms\n", (myTime2.tv_sec ) * 1000 + (myTime2.tv_usec ) / 1000);
+
+	printf("\n\n%d ms\n\n", (myTime2.tv_sec - myTime.tv_sec ) * 1000 + (myTime2.tv_usec - myTime.tv_usec ) / 1000);
+	printf("\n\n%d s\n\n", (myTime2.tv_sec - myTime.tv_sec ) );
 
 	if((fd = open(i2cdevName,O_RDWR)) < 0){
 		fprintf(stderr,"Can not open i2c port\n");
@@ -82,9 +102,6 @@ int main(int argc, char **argv)
 	int count = 0;
 	while (ros::ok())
 	{
-		/**
-		* This is a message object. You stuff it with data, and then publish it.
-		*/
 		std_msgs::String msg;
 
 		std::stringstream ss;
@@ -93,12 +110,6 @@ int main(int argc, char **argv)
 
 		//ROS_INFO("%s", msg.data.c_str());
 
-		/**
-		* The publish() function is how you send messages. The parameter
-		* is the message object. The type of this object must agree with the type
-		* given as a template parameter to the advertise<>() call, as was done
-		* in the constructor above.
-		*/
 		chatter_pub.publish(msg);
 
 		ros::spinOnce();
@@ -108,7 +119,7 @@ int main(int argc, char **argv)
 		//i2c_smbus_read_byte_data(fd,0x1f);
 		int cnt = 0;
 		while(cnt < 100){
-			sleep(10);
+			sleep(0.01);
 			__s32 val = i2c_smbus_read_byte_data(fd,0x14);
 			val = val & 0xff;
 			if(val & 0x01) break;
@@ -116,7 +127,7 @@ int main(int argc, char **argv)
 		}
 
 		__s32 pressxl = i2c_smbus_read_byte_data(fd,0x1f);
-		__s32 pressl  = 0;//i2c_smbus_read_byte_data(fd,0x1d);
+		__s32 pressl  = i2c_smbus_read_byte_data(fd,0x1e);
 	
 		pressxl = pressxl & 0xff;
 		pressl  = pressl & 0xff;

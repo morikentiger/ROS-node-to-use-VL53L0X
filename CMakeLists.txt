@@ -130,15 +130,15 @@ include_directories(
 ## Declare a C++ executable
 add_executable(test_vl53l0x_node src/vl53l0x_test.cpp)
 target_link_libraries(test_vl53l0x_node ${catkin_LIBRARIES})
-add_dependencies(test_vl53l0x_node test_vl53l0x_messages_cpp)
+#add_dependencies(test_vl53l0x_node test_vl53l0x_messages_cpp)
 
 add_executable(listener src/listener.cpp)
 target_link_libraries(listener ${catkin_LIBRARIES})
-add_dependencies(listener test_vl53l0x_messages_cpp)
+#add_dependencies(listener test_vl53l0x_messages_cpp)
 
 add_executable(test_vl53l0x_2ndnode src/VL53L0X.cpp src/Single.cpp)
-target_link_libraries(listener ${catkin_LIBRARIES})
-add_dependencies(listener test_vl53l0x_messages_cpp)
+target_link_libraries(test_vl53l0x_2ndnode ${catkin_LIBRARIES})
+#add_dependencies(test_vl53l0x_2ndnode test_vl53l0x_messages_cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
