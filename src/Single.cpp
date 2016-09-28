@@ -8,6 +8,7 @@
  The range readings are in units of mm. */
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+#include "std_msgs/Float64.h"
 
 #include <stdio.h>
 #include <stddef.h>	//#define NULL ...
@@ -70,20 +71,9 @@ void setup()
 #endif
 }
 
-void loop()
-{
-  //ROS_INFO("testloop");
-  //ROS_INFO(sensor.readRangeSingleMillimeters());
-  //if (sensor.timeoutOccurred()) { ROS_INFO(" TIMEOUT"); }
-  printf("readRangeSingleMillimeters:%d\n",sensor.readRangeSingleMillimeters());
-  if (sensor.timeoutOccurred()) { printf(" TIMEOUT_loop\n"); }
-  //ROS_INFO("testloopend");
-
-}
-
 int main(int argc, char **argv)
 {
-	////ROS_INFO("test0");	
+	////ROS_INFO("test0");
 	ros::init(argc, argv, "Single_VL53L0X");
 	ros::NodeHandle n;
 	printf("test\n");
@@ -94,7 +84,7 @@ int main(int argc, char **argv)
 	
 	//ROS_INFO("test3");
 	
-	ros::Publisher chatter_pub = n.advertise<std_msgs::String>("chatter", 1000);
+	ros::Publisher chatter_pub = n.advertise<std_msgs::Float64>("distance_m", 1000);
 
 	//ROS_INFO("test4");
 	ros::Rate loop_rate(10);
@@ -105,20 +95,32 @@ int main(int argc, char **argv)
 	{
 		//ROS_INFO("test6");
 		std_msgs::String msg;
+		std_msgs::Float64 distance;
 
 		std::stringstream ss;
 		ss << "hello world " << count;
 		msg.data = ss.str();
+		
+		  //ROS_INFO(sensor.readRangeSingleMillimeters());
+		  //if (sensor.timeoutOccurred()) { ROS_INFO(" TIMEOUT"); }
+		  float distance_m = sensor.readRangeSingleMillimeters();
+		distance_m = distance_m/1000;
+		  printf("readRangeSingleMillimeters:%lf\n",distance_m);
+		  if (sensor.timeoutOccurred()) { printf(" TIMEOUT_loop\n"); }
+		  //ROS_INFO("testloopend");
+		
+		distance.data = distance_m;
 
 		//ROS_INFO("%s", msg.data.c_str());
 
-		chatter_pub.publish(msg);
+		chatter_pub.publish(distance);
 
 		//ROS_INFO("test7");
 		ros::spinOnce();
 
 		//ROS_INFO("test8");
-		loop();
+		//ROS_INFO("testloop");
+		
 
 		//ROS_INFO("test9");
 		loop_rate.sleep();
